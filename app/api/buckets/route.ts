@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
 import { bucketSchema } from './schema';
+import { validateR2Connection } from '@/lib/r2';
 
 export async function POST(req: NextRequest) {
     const session = await getServerSession(authOptions);
@@ -25,7 +26,21 @@ export async function POST(req: NextRequest) {
         )
     }
 
-    const { accountId, bucketName, endpoint } = parsed.data
+    const { accountId, bucketName, endpoint, accessKeyId, secretAccessKey} = parsed.data
+
+    const validation = await validateR2Connection({
+        endpoint,
+        accessKeyId,
+        secretAccessKey,
+        bucketName
+    })
+
+    if(!validation.success){
+        return NextResponse.json(
+            { error: "Não foi possivel conectar ao bucket R2" },
+            { status: 400 }
+        )
+    }
 
     const user = await prisma.user.findUnique({
         where: { email: session.user.email }
@@ -54,7 +69,9 @@ export async function POST(req: NextRequest) {
             userId: user.id,
             accountId,
             bucketName,
-            endpoint
+            endpoint,
+            accessKeyId: accessKeyId,
+            secretAccessKey
         }
     })
 

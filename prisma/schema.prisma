@@ -77,8 +77,12 @@ model Bucket {
   bucketName String
   endpoint   String
 
+  accessKeyId     String
+  secretAccessKey String
+
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
+
 
 model Track {
   id        String   @id @default(cuid())
