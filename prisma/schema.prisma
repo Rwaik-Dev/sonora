@@ -112,7 +112,6 @@ model Playlist {
 model PlaylistTrack {
   playlistId String
   trackId    String
-  order      Int
 
   playlist Playlist @relation(fields: [playlistId], references: [id], onDelete: Cascade)
   track    Track    @relation(fields: [trackId], references: [id], onDelete: Cascade)
