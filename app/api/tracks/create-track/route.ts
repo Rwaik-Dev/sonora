@@ -3,6 +3,10 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 
+/**
+ * Cria uma música
+ *
+ */
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions)
 

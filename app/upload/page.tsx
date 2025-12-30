@@ -29,7 +29,7 @@ const handleUpload = async (file: any) => {
         if (!uploadRes.ok) throw new Error(`Erro no upload R2: ${uploadRes.statusText}`)
 
         // 3️⃣ salvar metadata no banco
-        await fetch("http://localhost:3000/api/tracks", {
+        await fetch("http://localhost:3000/api/tracks/create-track", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
