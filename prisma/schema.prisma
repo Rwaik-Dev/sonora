@@ -85,14 +85,15 @@ model Bucket {
 
 
 model Track {
-  id        String   @id @default(cuid())
-  userId    String
-  title     String
-  artist    String?
-  album     String?
-  duration  Int?
-  key       String
-  createdAt DateTime @default(now())
+  id          String   @id @default(cuid())
+  userId      String
+  title       String
+  artist      String?
+  album       String?
+  duration    Int?     // em segundos
+  contentType String
+  key         String   // caminho no R2
+  createdAt   DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 

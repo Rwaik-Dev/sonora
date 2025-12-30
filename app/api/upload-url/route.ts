@@ -56,9 +56,11 @@ export async function POST(req: NextRequest) {
         expiresIn: 60 * 5, // 5 minutos
     })
 
+    console.log("uploadUrl: ", uploadUrl)
+
     return NextResponse.json({
         uploadUrl,
-        key,
+        key
     })
 
 }
