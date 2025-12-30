@@ -3,7 +3,14 @@
 
 import { useEffect, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Pause, Play, SkipBack, SkipForward } from "lucide-react"
+import {
+  Pause,
+  Play,
+  SkipBack,
+  SkipForward,
+  Volume2,
+  VolumeX,
+} from "lucide-react"
 import { Slider } from "@/components/ui/slider"
 
 export function PlayerBar({
@@ -19,6 +26,8 @@ export function PlayerBar({
   const [playing, setPlaying] = useState(false)
   const [current, setCurrent] = useState(0)
   const [duration, setDuration] = useState(0)
+  const [volume, setVolume] = useState(1)
+  const [muted, setMuted] = useState(false)
 
   useEffect(() => {
     if (!track) return
@@ -36,6 +45,45 @@ export function PlayerBar({
 
     load()
   }, [track, track?.id])
+
+  useEffect(() => {
+    if (!audioRef.current) return
+    audioRef.current.volume = volume
+    audioRef.current.muted = muted
+  }, [volume, muted])
+
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (!audioRef.current) return
+
+      switch (e.code) {
+        case "Space":
+          e.preventDefault()
+          playing
+            ? audioRef.current.pause()
+            : audioRef.current.play()
+          setPlaying(!playing)
+          break
+        case "ArrowRight":
+          audioRef.current.currentTime += 5
+          break
+        case "ArrowLeft":
+          audioRef.current.currentTime -= 5
+          break
+        case "ArrowUp":
+          setVolume(v => Math.min(1, v + 0.1))
+          break
+        case "ArrowDown":
+          setVolume(v => Math.max(0, v - 0.1))
+          break
+        case "KeyM":
+          setMuted(!muted)
+          break
+      }
+    }
+    window.addEventListener("keydown", onKey)
+    return () => window.removeEventListener("keydown", onKey)
+  }, [playing, muted])
 
   function format(sec: number) {
     const m = Math.floor(sec / 60)
@@ -93,6 +141,26 @@ export function PlayerBar({
 
         <span>{format(duration)}</span>
       </div>
+      <div className="flex items-center gap-2 w-32">
+        <Button
+          size="icon"
+          variant="ghost"
+          onClick={() => setMuted(!muted)}
+        >
+          {muted || volume === 0 ? <VolumeX /> : <Volume2 />}
+        </Button>
+
+        <Slider
+          value={[muted ? 0 : volume * 100]}
+          max={100}
+          step={1}
+          onValueChange={([v]) => {
+            setVolume(v / 100)
+            setMuted(v === 0)
+          }}
+        />
+      </div>
+
     </div>
   )
 }
