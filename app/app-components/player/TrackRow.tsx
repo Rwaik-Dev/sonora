@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { Play } from "lucide-react"
+import AddToPlaylistDialog from "../playlist/AddToPlaylistDialog"
 
 export function TrackRow({
   track,
@@ -23,13 +24,17 @@ export function TrackRow({
         )}
       </div>
 
-      <Button
-        size="icon"
-        variant="ghost"
-        onClick={() => onPlay(track.id)}
-      >
-        <Play className="h-5 w-5" />
-      </Button>
+      <div className="">
+        <Button
+          size="icon"
+          variant="ghost"
+          onClick={() => onPlay(track.id)}
+        >
+          <Play className="h-5 w-5" />
+        </Button>
+
+        <AddToPlaylistDialog trackId={track.id} />
+      </div>
     </div>
   )
 }

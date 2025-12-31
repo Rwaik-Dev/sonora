@@ -6,26 +6,18 @@ datasource db {
   provider = "postgresql"
 }
 
-/**
- * =========================
- * AUTH MODELS (next-auth)
- * =========================
- */
-
 model User {
-  id            String    @id @default(cuid())
+  id            String     @id @default(cuid())
   name          String?
-  email         String?   @unique
+  email         String?    @unique
   emailVerified DateTime?
   image         String?
-  createdAt     DateTime  @default(now())
-
-  accounts Account[]
-  sessions Session[]
-
-  bucket    Bucket?
-  tracks    Track[]
-  playlists Playlist[]
+  createdAt     DateTime   @default(now())
+  accounts      Account[]
+  bucket        Bucket?
+  playlists     Playlist[]
+  sessions      Session[]
+  tracks        Track[]
 }
 
 model Account {
@@ -41,8 +33,7 @@ model Account {
   scope             String?
   id_token          String?
   session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -52,8 +43,7 @@ model Session {
   sessionToken String   @unique
   userId       String
   expires      DateTime
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model VerificationToken {
@@ -64,57 +54,44 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-/**
- * =========================
- * SONORA MODELS
- * =========================
- */
-
 model Bucket {
-  id         String @id @default(cuid())
-  userId     String @unique
-  accountId  String
-  bucketName String
-  endpoint   String
-
+  id              String @id @default(cuid())
+  userId          String @unique
+  accountId       String
+  bucketName      String
+  endpoint        String
   accessKeyId     String
   secretAccessKey String
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user            User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-
 model Track {
-  id          String   @id @default(cuid())
-  userId      String
-  title       String
-  artist      String?
-  album       String?
-  duration    Int?     // em segundos
-  contentType String
-  key         String   // caminho no R2
-  createdAt   DateTime @default(now())
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
+  id             String          @id @default(cuid())
+  userId         String
+  title          String
+  artist         String?
+  album          String?
+  duration       Int?
+  contentType    String
+  key            String
+  createdAt      DateTime        @default(now())
   playlistTracks PlaylistTrack[]
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Playlist {
-  id     String @id @default(cuid())
+  id     String          @id @default(cuid())
   name   String
   userId String
-
-  tracks PlaylistTrack[]
   user   User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tracks PlaylistTrack[]
 }
 
 model PlaylistTrack {
   playlistId String
   trackId    String
-
-  playlist Playlist @relation(fields: [playlistId], references: [id], onDelete: Cascade)
-  track    Track    @relation(fields: [trackId], references: [id], onDelete: Cascade)
+  playlist   Playlist @relation(fields: [playlistId], references: [id], onDelete: Cascade)
+  track      Track    @relation(fields: [trackId], references: [id], onDelete: Cascade)
 
   @@id([playlistId, trackId])
 }
