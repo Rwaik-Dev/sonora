@@ -23,6 +23,28 @@ export default function Home() {
     setCurrentIndex(null)
   }
 
+  function playPlaylist(tracks: Track[]) {
+    setTracks(tracks)
+    setCurrentIndex(0)
+  }
+
+  function next() {
+    setCurrentIndex(i => {
+      if (i === null) return null
+      if (i >= tracks.length - 1) return i
+      return i + 1
+    })
+  }
+  
+  function prev() {
+    setCurrentIndex(i => {
+      if (i === null) return null
+      if (i <= 0) return i
+      return i - 1
+    })
+  }
+  
+
   return (
     <div className="flex h-screen">
       <PlaylistSidebar onSelect={selectPlaylist} />
@@ -39,24 +61,21 @@ export default function Home() {
         {view === "playlist" && playlistId && (
           <PlaylistView
             playlistId={playlistId}
-            onPlay={setCurrentIndex}
+            onPlay={(index) => {
+              setTracks(tracks)
+              setCurrentIndex(index)
+            }}
+            onPlayAll={playPlaylist}
           />
         )}
       </main>
 
       <PlayerBar
         track={tracks[currentIndex ?? -1]}
-        onNext={() =>
-          currentIndex !== null &&
-          setCurrentIndex(i => (i! + 1) % tracks.length)
-        }
-        onPrev={() =>
-          currentIndex !== null &&
-          setCurrentIndex(i =>
-            (i! - 1 + tracks.length) % tracks.length
-          )
-        }
+        onNext={next}
+        onPrev={prev}
       />
+
     </div>
   )
 }
