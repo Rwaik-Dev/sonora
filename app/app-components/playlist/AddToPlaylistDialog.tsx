@@ -59,7 +59,7 @@ export default function AddToPlaylistDialog({ trackId }: { trackId: string }) {
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button size="icon" variant="ghost">
+                <Button size="icon" variant="ghost" className='hover:text-violet-600'>
                     <Plus className="h-4 w-4" />
                 </Button>
             </DialogTrigger>

@@ -12,15 +12,21 @@ import {
   VolumeX,
 } from "lucide-react"
 import { Slider } from "@/components/ui/slider"
+import { Shuffle } from "lucide-react"
 
 export function PlayerBar({
   track,
   onNext,
   onPrev,
+  onShuffle,
+  isShuffled
 }: {
   track?: { id: string; title: string }
   onNext: () => void
   onPrev: () => void
+  onShuffle: () => void
+  isShuffled: boolean
+
 }) {
   const audioRef = useRef<HTMLAudioElement>(null)
   const [playing, setPlaying] = useState(false)
@@ -92,75 +98,95 @@ export function PlayerBar({
   }
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 border-t bg-background p-4 space-y-2">
-      <audio
-        ref={audioRef}
-        onTimeUpdate={e => setCurrent(e.currentTarget.currentTime)}
-        onLoadedMetadata={e =>
-          setDuration(e.currentTarget.duration)
-        }
-        onEnded={onNext}
-      />
-
-      <div className="flex justify-center items-center gap-4">
-        <Button size="icon" variant="ghost" onClick={onPrev}>
-          <SkipBack />
-        </Button>
-
-        <Button
-          size="icon"
-          onClick={() => {
-            if (!audioRef.current) return
-            playing
-              ? audioRef.current.pause()
-              : audioRef.current.play()
-            setPlaying(!playing)
-          }}
-        >
-          {playing ? <Pause /> : <Play />}
-        </Button>
-
-        <Button size="icon" variant="ghost" onClick={onNext}>
-          <SkipForward />
-        </Button>
-      </div>
-
-      <div className="flex items-center gap-3 text-sm">
-        <span>{format(current)}</span>
-
-        <Slider
-          value={[current]}
-          max={duration}
-          step={1}
-          onValueChange={([v]) => {
-            if (audioRef.current) {
-              audioRef.current.currentTime = v
-            }
-          }}
+    <div className="fixed bottom-0 left-0 right-0 border-t border-violet-900 bg-background p-4 space-y-2 flex items-end justify-between gap-8">
+      <div className="w-full">
+        <audio
+          ref={audioRef}
+          onTimeUpdate={e => setCurrent(e.currentTarget.currentTime)}
+          onLoadedMetadata={e =>
+            setDuration(e.currentTarget.duration)
+          }
+          onEnded={onNext}
         />
 
-        <span>{format(duration)}</span>
-      </div>
-      <div className="flex items-center gap-2 w-32">
-        <Button
-          size="icon"
-          variant="ghost"
-          onClick={() => setMuted(!muted)}
-        >
-          {muted || volume === 0 ? <VolumeX /> : <Volume2 />}
-        </Button>
+        <div className="flex justify-center items-center gap-2 flex-col">
+          <p className="text-muted-foreground text-sm">
+            {track?.title}
+          </p>
+          <div className="flex justify-center items-center gap-2">
+            <Button size="icon" variant="ghost" onClick={onPrev}>
+              <SkipBack />
+            </Button>
 
-        <Slider
-          value={[muted ? 0 : volume * 100]}
-          max={100}
-          step={1}
-          onValueChange={([v]) => {
-            setVolume(v / 100)
-            setMuted(v === 0)
-          }}
-        />
-      </div>
+            <Button
+              size="icon"
+              className="bg-violet-600 hover:bg-violet-700 text-white"
+              onClick={() => {
+                if (!audioRef.current) return
+                playing
+                  ? audioRef.current.pause()
+                  : audioRef.current.play()
+                setPlaying(!playing)
+              }}
+            >
+              {playing ? <Pause /> : <Play />}
+            </Button>
 
+            <Button size="icon" variant="ghost" onClick={onNext}>
+              <SkipForward />
+            </Button>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3 text-sm">
+          <span>{format(current)}</span>
+
+          <Slider
+            value={[current]}
+            max={duration}
+            step={1}
+            onValueChange={([v]) => {
+              if (audioRef.current) {
+                audioRef.current.currentTime = v
+              }
+            }}
+          />
+
+          <span>{format(duration)}</span>
+        </div>
+      </div>
+      <div className="h-auto ">
+        <div className="flex justify-center">
+          <Button
+            size="icon"
+            variant={isShuffled ? "default" : "ghost"}
+            onClick={onShuffle}
+            className={isShuffled ? "text-violet-500 bg-accent/50 hover:bg-accent" : ""}
+          >
+            <Shuffle />
+          </Button>
+        </div>
+        <div className="flex items-center gap-2 w-32">
+          <Button
+            size="icon"
+            variant="ghost"
+            onClick={() => setMuted(!muted)}
+            className={muted || volume === 0 ? "text-violet-500 bg-accent/50 hover:bg-accent" : ""}
+          >
+            {muted || volume === 0 ? <VolumeX /> : <Volume2 />}
+          </Button>
+
+          <Slider
+            value={[muted ? 0 : volume * 100]}
+            max={100}
+            step={1}
+            onValueChange={([v]) => {
+              setVolume(v / 100)
+              setMuted(v === 0)
+            }}
+          />
+        </div>
+      </div>
     </div>
   )
 }

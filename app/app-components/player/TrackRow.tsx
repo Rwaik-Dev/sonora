@@ -14,7 +14,7 @@ export function TrackRow({
   onPlay: (id: string) => void
 }) {
   return (
-    <div className="flex items-center justify-between rounded-lg border p-3">
+    <div className="flex items-center justify-between rounded-lg p-3 bg-accent/50">
       <div>
         <p className="font-medium">{track.title}</p>
         {track.artist && (
@@ -29,6 +29,7 @@ export function TrackRow({
           size="icon"
           variant="ghost"
           onClick={() => onPlay(track.id)}
+          className="mr-2 hover:text-violet-600"
         >
           <Play className="h-5 w-5" />
         </Button>
