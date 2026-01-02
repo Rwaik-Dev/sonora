@@ -6,12 +6,16 @@ import { PlayerBar } from "@/app/app-components/player/PlayerBar"
 import { PlaylistView } from "./app-components/playlist/PlaylistView"
 import { PlaylistSidebar } from "./app-components/playlist/PlaylistSidebar"
 
+type RepeatMode = "off" | "one" | "all"
+
+
 export default function Home() {
   const [libraryTracks, setLibraryTracks] = useState<Track[]>([])
   const [tracks, setTracks] = useState<Track[]>([])
   const [originalTracks, setOriginalTracks] = useState<Track[]>([])
   const [currentIndex, setCurrentIndex] = useState<number | null>(null)
   const [isShuffled, setIsShuffled] = useState(false)
+  const [repeatMode, setRepeatMode] = useState<RepeatMode>("off")
 
   const [view, setView] = useState<"library" | "playlist">("library")
   const [playlistId, setPlaylistId] = useState<string | null>(null)
@@ -62,12 +66,20 @@ export default function Home() {
   }
 
   function next() {
-    setCurrentIndex(i => {
-      if (i === null) return null
-      if (i >= tracks.length - 1) return i
-      return i + 1
-    })
+    if (currentIndex === null) return
+  
+    const nextIndex = currentIndex + 1
+  
+    if (nextIndex < tracks.length) {
+      setCurrentIndex(nextIndex)
+      return
+    }
+  
+   if (repeatMode === "all") {
+      setCurrentIndex(0)
+    }
   }
+  
 
   function prev() {
     setCurrentIndex(i => {
@@ -121,6 +133,14 @@ export default function Home() {
         onPrev={prev}
         onShuffle={toggleShuffle}
         isShuffled={isShuffled}
+        repeatMode={repeatMode}
+        onToggleRepeat={() => {
+          setRepeatMode(prev => {
+            if (prev === "off") return "all"
+            if (prev === "all") return "one"
+            return "off"
+          })
+        }}
       />
 
     </div>

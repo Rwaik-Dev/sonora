@@ -6,6 +6,9 @@ import { Button } from "@/components/ui/button"
 import {
   Pause,
   Play,
+  Repeat,
+  Repeat1,
+  Repeat2,
   SkipBack,
   SkipForward,
   Volume2,
@@ -14,18 +17,24 @@ import {
 import { Slider } from "@/components/ui/slider"
 import { Shuffle } from "lucide-react"
 
+type RepeatMode = "off" | "one" | "all"
+
 export function PlayerBar({
   track,
   onNext,
   onPrev,
   onShuffle,
-  isShuffled
+  isShuffled,
+  repeatMode,
+  onToggleRepeat
 }: {
   track?: { id: string; title: string }
   onNext: () => void
   onPrev: () => void
   onShuffle: () => void
   isShuffled: boolean
+  repeatMode: RepeatMode,
+  onToggleRepeat: () => void
 
 }) {
   const audioRef = useRef<HTMLAudioElement>(null)
@@ -34,6 +43,7 @@ export function PlayerBar({
   const [duration, setDuration] = useState(0)
   const [volume, setVolume] = useState(1)
   const [muted, setMuted] = useState(false)
+  // const [repeatMode, setRepeatMode] = useState<RepeatMode>("off")
 
   useEffect(() => {
     if (!track) return
@@ -106,7 +116,14 @@ export function PlayerBar({
           onLoadedMetadata={e =>
             setDuration(e.currentTarget.duration)
           }
-          onEnded={onNext}
+          onEnded={() => {
+            if (repeatMode === "one") {
+              audioRef.current?.play()
+              return
+            }
+
+            onNext()
+          }}
         />
 
         <div className="flex justify-center items-center gap-2 flex-col">
@@ -155,23 +172,34 @@ export function PlayerBar({
           <span>{format(duration)}</span>
         </div>
       </div>
-      <div className="h-auto ">
-        <div className="flex justify-center">
+      <div className="h-auto">
+        <div className="flex justify-center gap-1 mb-2">
           <Button
             size="icon"
             variant={isShuffled ? "default" : "ghost"}
             onClick={onShuffle}
-            className={isShuffled ? "text-violet-500 bg-accent/50 hover:bg-accent" : ""}
+            className={isShuffled ? "text-violet-500 bg-accent/50 hover:bg-accent border-violet-500/30 border" : ""}
           >
             <Shuffle />
           </Button>
+          <Button
+            size={"icon"}
+            variant={"default"}
+            onClick={onToggleRepeat}
+            className={repeatMode !== "off" ? "text-violet-500 bg-accent/50 hover:bg-accent border-violet-500/30 border" : "text-white bg- hover:bg-accent"}
+          >
+            {repeatMode === "off" && <Repeat />}
+            {repeatMode === "all" && <Repeat2 />}
+            {repeatMode === "one" && <Repeat1 />}
+          </Button>
+
         </div>
         <div className="flex items-center gap-2 w-32">
           <Button
             size="icon"
             variant="ghost"
             onClick={() => setMuted(!muted)}
-            className={muted || volume === 0 ? "text-violet-500 bg-accent/50 hover:bg-accent" : ""}
+            className={muted || volume === 0 ? "text-violet-500 bg-accent/50 hover:bg-accent " : ""}
           >
             {muted || volume === 0 ? <VolumeX /> : <Volume2 />}
           </Button>
